@@ -179,10 +179,10 @@ Use of some C++ features is restricted or disallowed.  Do not use
 
 <h2 id="Header_Files">Header Files</h2>
 
-<p>In general, every <code>.cc</code> file should have an
-associated <code>.h</code> file. There are some common
+<p>In general, every <code>.cpp</code> file should have an
+associated <code>.hpp</code> file. There are some common
 exceptions, such as  unittests and
-small <code>.cc</code> files containing just a
+small <code>.cpp</code> files containing just a
 <code>main()</code> function.</p>
 
 <p>Correct use of header files can make a huge difference to
@@ -196,7 +196,7 @@ pitfalls of using header files.</p>
 
 <div class="summary">
 <p>Header files should be self-contained (compile on their own) and
-end in <code>.h</code>.  Non-header files that are meant for inclusion
+end in <code>.hpp</code>.  Non-header files that are meant for inclusion
 should end in <code>.inc</code> and be used sparingly.</p>
 </div> 
 
@@ -209,17 +209,17 @@ other headers it needs.</p>
 
 <p>Prefer placing the definitions for template and inline functions in
 the same file as their declarations.  The definitions of these
-constructs must be included into every <code>.cc</code> file that uses
+constructs must be included into every <code>.cpp</code> file that uses
 them, or the program may fail to link in some build configurations.  If
 declarations and definitions are in different files, including the
 former should transitively include the latter.  Do not move these
-definitions to separately included header files (<code>-inl.h</code>);
+definitions to separately included header files (<code>-inl.hpp</code>);
 this practice was common in the past, but is no longer allowed.</p>
 
 <p>As an exception, a template that is explicitly instantiated for
 all relevant sets of template arguments, or that is a private
 implementation detail of a class, is allowed to be defined in the one
-and only <code>.cc</code> file that instantiates the template.</p>
+and only <code>.cpp</code> file that instantiates the template.</p>
 
 <p>There are rare cases where a file designed to be included is not
 self-contained.  These are typically intended to be included at unusual
@@ -237,7 +237,7 @@ possible.</p>
 <p>All header files should have <code>#define</code> guards to
 prevent multiple inclusion. The format of the symbol name
 should be
-<code><i>&lt;PROJECT&gt;</i>_<i>&lt;PATH&gt;</i>_<i>&lt;FILE&gt;</i>_H_</code>.</p>
+<code><i>&lt;PROJECT&gt;</i>_<i>&lt;PATH&gt;</i>_<i>&lt;FILE&gt;</i>_HPP_</code>.</p>
 </div> 
 
 <div class="stylebody">
@@ -250,12 +250,12 @@ example, the file <code>foo/src/bar/baz.h</code> in
 project <code>foo</code> should have the following
 guard:</p>
 
-<pre>#ifndef FOO_BAR_BAZ_H_
-#define FOO_BAR_BAZ_H_
+<pre>#ifndef FOO_BAR_BAZ_HPP_
+#define FOO_BAR_BAZ_HPP_
 
 ...
 
-#endif  // FOO_BAR_BAZ_H_
+#endif  // FOO_BAR_BAZ_HPP_
 </pre>
 
 
@@ -311,12 +311,12 @@ function, or template without an associated definition.</p>
   Replacing an <code>#include</code> with a forward
   declaration can silently change the meaning of
   code:
-      <pre>      // b.h:
+      <pre>      // b.hpp:
       struct B {};
       struct D : B {};
 
-      // good_user.cc:
-      #include "b.h"
+      // good_user.cpp:
+      #include "b.hpp"
       void f(B*);
       void f(void*);
       void test(D* x) { f(x); }  // calls f(B*)
@@ -427,51 +427,53 @@ directory without use of UNIX directory shortcuts
 <code>.</code> (the current directory) or <code>..</code>
 (the parent directory). For example,
 
-<code>google-awesome-project/src/base/logging.h</code>
+<code>google-awesome-project/src/base/logging.hpp</code>
 should be included as:</p>
 
-<pre>#include "base/logging.h"
+<pre>#include "base/logging.hpp"
 </pre>
 
-<p>In <code><var>dir/foo</var>.cc</code> or
-<code><var>dir/foo_test</var>.cc</code>, whose main
+<p>In <code><var>dir/foo</var>.cpp</code> or
+<code><var>dir/foo_test</var>.cpp</code>, whose main
 purpose is to implement or test the stuff in
-<code><var>dir2/foo2</var>.h</code>, order your includes
+<code><var>dir2/foo2</var>.hpp</code>, order your includes
 as follows:</p>
 
 <ol>
-  <li><code><var>dir2/foo2</var>.h</code>.</li>
+  <li><code><var>dir2/foo2</var>.hpp</code>.</li>
+
+  <li>A blank line</li>
+
+  <li>
+  Your project's <code>.hpp</code>
+  files.</li>
+
+  <li>A blank line</li>
+
+  <li>Other libraries' <code>.hpp</code>
+  files.</li>
 
   <li>A blank line</li>
 
   <li>C system files.</li>
 
   <li>C++ system files.</li>
-
-  <li>A blank line</li>
-
-  <li>Other libraries' <code>.h</code>
-  files.</li>
-
-  <li>
-  Your project's <code>.h</code>
-  files.</li>
 </ol>
 
 <p>Note that any adjacent blank lines should be collapsed.</p>
 
 <p>With the preferred ordering, if
-<code><var>dir2/foo2</var>.h</code> omits any necessary
-includes, the build of <code><var>dir/foo</var>.cc</code>
-or <code><var>dir/foo</var>_test.cc</code> will break.
+<code><var>dir2/foo2</var>.hpp</code> omits any necessary
+includes, the build of <code><var>dir/foo</var>.cpp</code>
+or <code><var>dir/foo</var>_test.cpp</code> will break.
 Thus, this rule ensures that build breaks show up first
 for the people working on these files, not for innocent
 people in other packages.</p>
 
-<p><code><var>dir/foo</var>.cc</code> and
-<code><var>dir2/foo2</var>.h</code> are usually in the same
-directory (e.g. <code>base/basictypes_test.cc</code> and
-<code>base/basictypes.h</code>), but may sometimes be in different
+<p><code><var>dir/foo</var>.cpp</code> and
+<code><var>dir2/foo2</var>.hpp</code> are usually in the same
+directory (e.g. <code>base/basictypes_test.cpp</code> and
+<code>base/basictypes.hpp</code>), but may sometimes be in different
 directories too.</p>
 
 
@@ -487,30 +489,31 @@ this rule and should be fixed when convenient.</p>
 
 <p>You should include all the headers that define the symbols you rely
 upon, except in the unusual case of <a href="#Forward_Declarations">forward
-declaration</a>. If you rely on symbols from <code>bar.h</code>,
-don't count on the fact that you included <code>foo.h</code> which
-(currently) includes <code>bar.h</code>: include <code>bar.h</code>
-yourself, unless <code>foo.h</code> explicitly demonstrates its intent
-to provide you the symbols of <code>bar.h</code>.  However, any
+declaration</a>. If you rely on symbols from <code>bar.hpp</code>,
+don't count on the fact that you included <code>foo.hpp</code> which
+(currently) includes <code>bar.hpp</code>: include <code>bar.hpp</code>
+yourself, unless <code>foo.hpp</code> explicitly demonstrates its intent
+to provide you the symbols of <code>bar.hpp</code>.  However, any
 includes present in the related header do not need to be included
-again in the related <code>cc</code> (i.e., <code>foo.cc</code> can
-rely on <code>foo.h</code>'s includes).</p>
+again in the related <code>cpp</code> (i.e., <code>foo.cpp</code> can
+rely on <code>foo.hpp</code>'s includes).</p>
 
 <p>For example, the includes in
 
-<code>google-awesome-project/src/foo/internal/fooserver.cc</code>
+<code>google-awesome-project/src/foo/internal/fooserver.cpp</code>
 might look like this:</p>
 
 
-<pre>#include "foo/server/fooserver.h"
+<pre>
+#include "fooserver.hpp"
+#include "bar.hpp"
+
+#include &lt;base/basictypes.hpp&gt;
+#include &lt;base/commandlineflags.hpp&gt;
 
 #include &lt;sys/types.h&gt;
 #include &lt;unistd.h&gt;
 #include &lt;vector&gt;
-
-#include "base/basictypes.h"
-#include "base/commandlineflags.h"
-#include "foo/server/bar.h"
 </pre>
 
 <p class="exception">Sometimes, system-specific code needs
@@ -518,9 +521,9 @@ conditional includes. Such code can put conditional
 includes after other includes. Of course, keep your
 system-specific code small and localized. Example:</p>
 
-<pre>#include "foo/public/fooserver.h"
+<pre>#include "fooserver.hpp"
 
-#include "base/port.h"  // For LANG_CXX11.
+#include &lt;base/port.hpp&gt;  // For LANG_CXX11.
 
 #ifdef LANG_CXX11
 #include &lt;initializer_list&gt;
@@ -613,35 +616,35 @@ namespaces, this can add a lot of clutter.</p>
   gflags</a> definitions/declarations
   and forward declarations of classes from other namespaces.</p>
 
-<pre>// In the .h file
+<pre>// In the .hpp file
 namespace mynamespace {
 
 // All declarations are within the namespace scope.
 // Notice the lack of indentation.
 class MyClass {
- public:
+public:
   ...
-  void Foo();
+  void foo();
 };
 
 }  // namespace mynamespace
 </pre>
 
-<pre>// In the .cc file
+<pre>// In the .cpp file
 namespace mynamespace {
 
 // Definition of functions is within scope of the namespace.
-void MyClass::Foo() {
+void MyClass::foo() {
   ...
 }
 
 }  // namespace mynamespace
 </pre>
 
-  <p>More complex <code>.cc</code> files might have additional details,
+  <p>More complex <code>.cpp</code> files might have additional details,
   like flags or using-declarations.</p>
 
-<pre>#include "a.h"
+<pre>#include "a.hpp"
 
 DEFINE_FLAG(bool, someflag, false, "dummy flag");
 
@@ -685,11 +688,11 @@ using namespace foo;
   in a header file becomes part of the public
   API exported by that file.</p>
 
-<pre>// Shorten access to some commonly used names in .cc files.
+<pre>// Shorten access to some commonly used names in .cpp files.
 namespace baz = ::foo::bar::baz;
 </pre>
 
-<pre>// Shorten access to some commonly used names (in a .h file).
+<pre>// Shorten access to some commonly used names (in a .hpp file).
 namespace librarian {
 namespace impl {  // Internal, not part of the API.
 namespace sidetable = ::pipeline_diagnostics::sidetable;
@@ -712,10 +715,10 @@ inline void my_inline_function() {
 Variables</h3>
 
 <div class="summary">
-<p>When definitions in a <code>.cc</code> file do not need to be
+<p>When definitions in a <code>.cpp</code> file do not need to be
 referenced outside that file, place them in an unnamed
 namespace or declare them <code>static</code>. Do not use either
-of these constructs in <code>.h</code> files.
+of these constructs in <code>.hpp</code> files.
 </p></div>
 
 <div class="stylebody">
@@ -730,9 +733,9 @@ the same name, then the two entities are completely independent.</p>
 
 <div class="decision">
 
-<p>Use of internal linkage in <code>.cc</code> files is encouraged
+<p>Use of internal linkage in <code>.cpp</code> files is encouraged
 for all code that does not need to be referenced elsewhere.
-Do not use internal linkage in <code>.h</code> files.</p>
+Do not use internal linkage in <code>.hpp</code> files.</p>
 
 <p>Format unnamed namespaces like named namespaces. In the
   terminating comment, leave the namespace name empty:</p>
@@ -778,7 +781,7 @@ this is no different than just giving the function names a
 common prefix, and such grouping is usually unnecessary anyway.</p>
 
 <p>If you define a nonmember function and it is only
-needed in its <code>.cc</code> file, use
+needed in its <code>.cpp</code> file, use
 <a href="#Unnamed_Namespaces_and_Static_Variables">internal linkage</a> to limit
 its scope.</p>
 </div>
@@ -833,7 +836,7 @@ out of scope.</p>
 <pre class="badcode">// Inefficient implementation:
 for (int i = 0; i &lt; 1000000; ++i) {
   Foo f;  // My ctor and dtor get called 1000000 times each.
-  f.DoSomething(i);
+  f.do_something(i);
 }
 </pre>
 
@@ -842,7 +845,7 @@ used in a loop outside that loop:</p>
 
 <pre>Foo f;  // My ctor and dtor get called once each.
 for (int i = 0; i &lt; 1000000; ++i) {
-  f.DoSomething(i);
+  f.do_something(i);
 }
 </pre>
 
@@ -926,24 +929,24 @@ variables marked with <code>constexpr</code> are trivially destructible.</p>
 <pre>const int kNum = 10;  // allowed
 
 struct X { int n; };
-const X kX[] = {{1}, {2}, {3}};  // allowed
+const X k_x[] = {{1}, {2}, {3}};  // allowed
 
 void foo() {
-  static const char* const kMessages[] = {"hello", "world"};  // allowed
+  static const char* const k_messages[] = {"hello", "world"};  // allowed
 }
 
 // allowed: constexpr guarantees trivial destructor
-constexpr std::array&lt;int, 3&gt; kArray = {{1, 2, 3}};</pre>
+constexpr std::array&lt;int, 3&gt; k_array = {{1, 2, 3}};</pre>
 <pre class="badcode">// bad: non-trivial destructor
-const string kFoo = "foo";
+const string k_foo = "foo";
 
-// bad for the same reason, even though kBar is a reference (the
+// bad for the same reason, even though k_bar is a reference (the
 // rule also applies to lifetime-extended temporary objects)
-const string&amp; kBar = StrCat("a", "b", "c");
+const string&amp; k_bar = StrCat("a", "b", "c");
 
 void bar() {
   // bad: non-trivial destructor
-  static std::map&lt;int, int&gt; kData = {{1, 0}, {2, 0}, {3, 0}};
+  static std::map&lt;int, int&gt; k_data = {{1, 0}, {2, 0}, {3, 0}};
 }</pre>
 
 <p>Note that references are not objects, and thus they are not subject to the
@@ -1043,105 +1046,7 @@ does not make an observable difference. For example:</p>
     expression.)</li>
 </ul>
 
-</div> 
-
-<h3 id="thread_local">thread_local Variables</h3>
-
-<div class="summary">
-<p><code>thread_local</code> variables that aren't declared inside a function
-must be initialized with a true compile-time constant,
-and this must be enforced by using the
-
-<a href="https://github.com/abseil/abseil-cpp/blob/master/absl/base/attributes.h">
-<code>ABSL_CONST_INIT</code></a>
-attribute. Prefer
-<code>thread_local</code> over other ways of defining thread-local data.</p>
 </div>
-
-<div class="stylebody">
-
-<div class="definition">
-<p>Starting with C++11, variables can be declared with the
-<code>thread_local</code> specifier:</p>
-<pre>thread_local Foo foo = ...;
-</pre>
-<p>Such a variable is actually a collection of objects, so that when different
-threads access it, they are actually accessing different objects.
-<code>thread_local</code> variables are much like
-<a href="#Static_and_Global_Variables">static storage duration variables</a>
-in many respects. For instance, they can be declared at namespace scope,
-inside functions, or as static class members, but not as ordinary class
-members.</p>
-
-<p><code>thread_local</code> variable instances are initialized much like
-static variables, except that they must be initialized separately for each
-thread, rather than once at program startup. This means that
-<code>thread_local</code> variables declared within a function are safe, but
-other <code>thread_local</code> variables are subject to the same
-initialization-order issues as static variables (and more besides).</p>
-
-<p><code>thread_local</code> variable instances are destroyed when their thread
-terminates, so they do not have the destruction-order issues of static
-variables.</p>
-</div>
-
-<div class="pros">
-<ul>
-  <li>Thread-local data is inherently safe from races (because only one thread
-    can ordinarily access it), which makes <code>thread_local</code> useful for
-    concurrent programming.</li>
-  <li><code>thread_local</code> is the only standard-supported way of creating
-    thread-local data.</li>
-</ul>
-</div>
-
-<div class="cons">
-<ul>
-  <li>Accessing a <code>thread_local</code> variable may trigger execution of
-    an unpredictable and uncontrollable amount of other code.</li>
-  <li><code>thread_local</code> variables are effectively global variables,
-    and have all the drawbacks of global variables other than lack of
-    thread-safety.</li>
-  <li>The memory consumed by a <code>thread_local</code> variable scales with
-    the number of running threads (in the worst case), which can be quite large
-    in a  program.</li>
-  <li>An ordinary class member cannot be <code>thread_local</code>.</li>
-  <li><code>thread_local</code> may not be as efficient as certain compiler
-    intrinsics.</li>
-</ul>
-</div>
-
-<div class="decision">
-  <p><code>thread_local</code> variables inside a function have no safety
-    concerns, so they can be used without restriction. Note that you can use
-    a function-scope <code>thread_local</code> to simulate a class- or
-    namespace-scope <code>thread_local</code> by defining a function or
-    static method that exposes it:</p>
-
-<pre>Foo&amp; MyThreadLocalFoo() {
-  thread_local Foo result = ComplicatedInitialization();
-  return result;
-}
-</pre>
-
-  <p><code>thread_local</code> variables at class or namespace scope must be
-    initialized with a true compile-time constant (i.e. they must have no
-    dynamic initialization). To enforce this,
-    <code>thread_local</code> variables at class or namespace scope must be
-    annotated with
-    
-    <a href="https://github.com/abseil/abseil-cpp/blob/master/absl/base/attributes.h">
-    <code>ABSL_CONST_INIT</code></a>
-    (or <code>constexpr</code>, but that should be rare):</p>
-
-<pre>ABSL_CONST_INIT thread_local Foo foo = ...;
-</pre>
-
-  <p><code>thread_local</code> should be preferred over other mechanisms for
-    defining thread-local data.</p>
-</div>
-
-</div> 
 
 
 <h2 id="Classes">Classes</h2>
@@ -1153,7 +1058,7 @@ don'ts you should follow when writing a class.</p>
 <h3 id="Doing_Work_in_Constructors">Doing Work in Constructors</h3>
 
 <div class="summary">
-<p>Avoid virtual method calls in constructors, and avoid
+<p>Avoid virtual method calls in constructors, avoid initializing hardware, and avoid
 initialization that can fail if you can't signal an error.</p>
 </div>
 
@@ -1190,7 +1095,7 @@ of the constructor.</p>
 
   <li>If the work fails, we now have an object whose initialization
   code failed, so it may be an unusual state requiring a <code>bool
-  IsValid()</code> state checking mechanism (or similar) which is easy
+  is_valid()</code> state checking mechanism (or similar) which is easy
   to forget to call.</li>
 
   <li>You cannot take the address of a constructor, so whatever work
@@ -1206,12 +1111,12 @@ for your code
 ,
 terminating the program may be an appropriate error handling
 response. Otherwise, consider a factory function
-or <code>Init()</code> method as described in
+or <code>init()</code> method as described in
 
 
 <a href="https://abseil.io/tips/42">TotW #42</a>
 .
-Avoid <code>Init()</code> methods on objects with
+Avoid <code>init()</code> methods on objects with
 no other states that affect which public methods may be called
 (semi-constructed objects of this form are particularly hard to work
 with correctly).</p>
@@ -1257,7 +1162,7 @@ C++11's list initialization syntax:</p>
   ...
 };
 
-void Func(Foo f);
+void func(Foo f);
 </pre>
 <pre class="badcode">Func({42, 3.14});  // Error
 </pre>
@@ -1704,7 +1609,7 @@ built-in operators. For example, use <code>|</code> as a
 bitwise- or logical-or, not as a shell-style pipe.</p>
 
 <p>Define operators only on your own types. More precisely,
-define them in the same headers, .cc files, and namespaces
+define them in the same headers, .cpp files, and namespaces
 as the types they operate on. That way, the operators are available
 wherever the type is, minimizing the risk of multiple
 definitions. If possible, avoid defining operators as templates,
@@ -1762,7 +1667,7 @@ naming convention for constants</a>).</p>
 <div class="stylebody">
 
 <p>For technical
-reasons, we allow data members of a test fixture class in a .cc file to
+reasons, we allow data members of a test fixture class in a .cpp file to
 be <code>protected</code> when using
 
 
@@ -3377,7 +3282,7 @@ with macros; if you use macros, follow it whenever
 possible:</p>
 
 <ul>
-  <li>Don't define macros in a <code>.h</code> file.</li>
+  <li>Don't define macros in a <code>.hpp</code> file.</li>
 
   <li><code>#define</code> macros right before you use
   them, and <code>#undef</code> them right after.</li>
@@ -3862,132 +3767,6 @@ and actionable from a user point of view.</p>
 
 </div> 
 </div> 
-
-
-<h3 id="Boost">Boost</h3>
-
-<div class="summary">
-<p>Use only approved libraries from the Boost library
-collection.</p>
-</div>
-
-<div class="stylebody">
-
-<div class="definition">
-<p> The
-<a href="https://www.boost.org/">
-Boost library collection</a> is a popular collection of
-peer-reviewed, free, open-source C++ libraries.</p>
-</div>
-
-<div class="pros">
-<p>Boost code is generally very high-quality, is widely
-portable, and fills many important gaps in the C++
-standard library, such as type traits and better binders.</p>
-</div>
-
-<div class="cons">
-<p>Some Boost libraries encourage coding practices which can
-hamper readability, such as metaprogramming and other
-advanced template techniques, and an excessively
-"functional" style of programming. </p>
-</div>
-
-<div class="decision">
-
- 
-
-<div>
-<p>In order to maintain a high level of readability for
-all contributors who might read and maintain code, we
-only allow an approved subset of Boost features.
-Currently, the following libraries are permitted:</p>
-
-<ul>
-  <li>
-  <a href="https://www.boost.org/libs/utility/call_traits.htm">
-  Call Traits</a> from <code>boost/call_traits.hpp</code></li>
-
-  <li><a href="https://www.boost.org/libs/utility/compressed_pair.htm">
-  Compressed Pair</a> from  <code>boost/compressed_pair.hpp</code></li>
-
-  <li><a href="https://www.boost.org/libs/graph/">
-  The Boost Graph Library (BGL)</a> from <code>boost/graph</code>,
-  except serialization (<code>adj_list_serialize.hpp</code>) and
-   parallel/distributed algorithms and data structures
-   (<code>boost/graph/parallel/*</code> and
-   <code>boost/graph/distributed/*</code>).</li>
-
-  <li><a href="https://www.boost.org/libs/property_map/">
-  Property Map</a> from <code>boost/property_map</code>, except
-  parallel/distributed property maps (<code>boost/property_map/parallel/*</code>).</li>
-
-  <li><a href="https://www.boost.org/libs/iterator/">
-  Iterator</a> from <code>boost/iterator</code></li>
-
-  <li>The part of <a href="https://www.boost.org/libs/polygon/">
-  Polygon</a> that deals with Voronoi diagram
-  construction and doesn't depend on the rest of
-  Polygon:
-  <code>boost/polygon/voronoi_builder.hpp</code>,
-  <code>boost/polygon/voronoi_diagram.hpp</code>, and
-  <code>boost/polygon/voronoi_geometry_type.hpp</code></li>
-
-  <li><a href="https://www.boost.org/libs/bimap/">
-  Bimap</a> from <code>boost/bimap</code></li>
-
-  <li><a href="https://www.boost.org/libs/math/doc/html/dist.html">
-  Statistical Distributions and Functions</a> from
-  <code>boost/math/distributions</code></li>
-
-  <li><a href="https://www.boost.org/libs/math/doc/html/special.html">
-  Special Functions</a> from <code>boost/math/special_functions</code></li>
-
-  <li><a href="https://www.boost.org/libs/multi_index/">
-  Multi-index</a> from <code>boost/multi_index</code></li>
-
-  <li><a href="https://www.boost.org/libs/heap/">
-  Heap</a> from <code>boost/heap</code></li>
-
-  <li>The flat containers from
-  <a href="https://www.boost.org/libs/container/">Container</a>:
-  <code>boost/container/flat_map</code>, and
-  <code>boost/container/flat_set</code></li>
-
-  <li><a href="https://www.boost.org/libs/intrusive/">Intrusive</a>
-  from <code>boost/intrusive</code>.</li>
-
-  <li><a href="https://www.boost.org/libs/sort/">The
-  <code>boost/sort</code> library</a>.</li>
-
-  <li><a href="https://www.boost.org/libs/preprocessor/">Preprocessor</a>
-  from <code>boost/preprocessor</code>.</li>
-</ul>
-
-<p>We are actively considering adding other Boost
-features to the list, so this list may be expanded in
-the future.</p>
-</div> 
-
-<p>The following libraries are permitted, but their use
-is discouraged because they've been superseded by
-standard libraries in C++11:</p>
-
-<ul>
-  <li><a href="https://www.boost.org/libs/array/">
-  Array</a> from <code>boost/array.hpp</code>: use
-  <a href="http://en.cppreference.com/w/cpp/container/array">
-   <code>std::array</code></a> instead.</li>
-
-   <li><a href="https://www.boost.org/libs/ptr_container/">
-   Pointer Container</a> from <code>boost/ptr_container</code>: use containers of
-   <a href="http://en.cppreference.com/w/cpp/memory/unique_ptr">
-   <code>std::unique_ptr</code></a> instead.</li>
-</ul>
-</div> 
-
-</div> 
-
  
 
 <h3 id="std_hash">std::hash</h3>
@@ -4219,7 +3998,7 @@ using other_namespace::Foo;
 
   <p>Like other declarations, aliases declared in a header file are part of that
   header's public API unless they're in a function definition, in the private portion of a class,
-  or in an explicitly-marked internal namespace. Aliases in such areas or in .cc files are
+  or in an explicitly-marked internal namespace. Aliases in such areas or in .cpp files are
   implementation details (because client code can't refer to them), and are not restricted by this
   rule.</p>
 </div>
@@ -4284,9 +4063,9 @@ typedef unordered_set&lt;DataPoint, hash&lt;DataPoint&gt;, DataPointComparator&g
 </pre>
 
 <p>However, local convenience aliases are fine in function definitions, private sections of
-  classes, explicitly marked internal namespaces, and in .cc files:</p>
+  classes, explicitly marked internal namespaces, and in .cpp files:</p>
 
-<pre>// In a .cc file
+<pre>// In a .cpp file
 using foo::Bar;
 </pre>
 
@@ -4379,25 +4158,25 @@ local pattern to follow, prefer "_".</p>
 <p>Examples of acceptable file names:</p>
 
 <ul>
-  <li><code>my_useful_class.cc</code></li>
-  <li><code>my-useful-class.cc</code></li>
-  <li><code>myusefulclass.cc</code></li>
-  <li><code>myusefulclass_test.cc // _unittest and _regtest are deprecated.</code></li>
+  <li><code>my_useful_class.cpp</code></li>
+  <li><code>my-useful-class.cpp</code></li>
+  <li><code>myusefulclass.cpp</code></li>
+  <li><code>myusefulclass_test.cpp // _unittest and _regtest are deprecated.</code></li>
 </ul>
 
-<p>C++ files should end in <code>.cc</code> and header files should end in
-<code>.h</code>. Files that rely on being textually included at specific points
+<p>C++ files should end in <code>.cpp</code> and header files should end in
+<code>.hpp</code>. Files that rely on being textually included at specific points
 should end in <code>.inc</code> (see also the section on
 <a href="#Self_contained_Headers">self-contained headers</a>).</p>
 
 <p>Do not use filenames that already exist in
-<code>/usr/include</code>, such as <code>db.h</code>.</p>
+<code>/usr/include</code>, such as <code>db.hpp</code>.</p>
 
 <p>In general, make your filenames very specific. For
-example, use <code>http_server_logs.h</code> rather than
-<code>logs.h</code>. A very common case is to have a pair
-of files called, e.g., <code>foo_bar.h</code> and
-<code>foo_bar.cc</code>, defining a class called
+example, use <code>http_server_logs.hpp</code> rather than
+<code>logs.hpp</code>. A very common case is to have a pair
+of files called, e.g., <code>foo_bar.hpp</code> and
+<code>foo_bar.cpp</code>, defining a class called
 <code>FooBar</code>.</p>
 
 </div> 
@@ -4584,7 +4363,7 @@ added to the same <code>internal</code> namespace causing a collision
 collisions). In such a situation, using the filename to make a unique
 internal name is helpful
 (<code>websearch::index::frobber_internal</code> for use
-in <code>frobber.h</code>)</p>
+in <code>frobber.hpp</code>)</p>
 
 </div> 
 
@@ -4746,14 +4525,14 @@ author line.</p>
 
 <h4 class="stylepoint_subsection">File Contents</h4>
 
-<p>If a <code>.h</code> declares multiple abstractions, the file-level comment
+<p>If a <code>.hpp</code> declares multiple abstractions, the file-level comment
 should broadly describe the contents of the file, and how the abstractions are
 related. A 1 or 2 sentence file-level comment may be sufficient. The detailed
 documentation about individual abstractions belongs with those abstractions,
 not at the file level.</p>
 
-<p>Do not duplicate comments in both the <code>.h</code> and the
-<code>.cc</code>. Duplicated comments diverge.</p>
+<p>Do not duplicate comments in both the <code>.hpp</code> and the
+<code>.cpp</code>. Duplicated comments diverge.</p>
 
 </div> 
 
@@ -4788,7 +4567,7 @@ surrounding multithreaded use.</p>
 <p>The class comment is often a good place for a small example code snippet
 demonstrating a simple and focused usage of the class.</p>
 
-<p>When sufficiently separated (e.g. <code>.h</code> and <code>.cc</code>
+<p>When sufficiently separated (e.g. <code>.hpp</code> and <code>.cpp</code>
 files), comments describing the use of the class should go together with its
 interface definition; comments about the class operation and implementation
 should accompany the implementation of the class's methods.</p>
@@ -4894,7 +4673,7 @@ the second half.</p>
 
 <p>Note you should <em>not</em> just repeat the comments
 given with the function declaration, in the
-<code>.h</code> file or wherever. It's okay to
+<code>.hpp</code> file or wherever. It's okay to
 recapitulate briefly what the function does, but the
 focus of the comments should be on how it does it.</p>
 
@@ -6336,7 +6115,7 @@ style:</p>
 <ul>
   <li>Do not use Hungarian notation (for example, naming
   an integer <code>iNum</code>). Use the Google naming
-  conventions, including the <code>.cc</code> extension
+  conventions, including the <code>.cpp</code> extension
   for source files.</li>
 
   <li>Windows defines many of its own synonyms for
@@ -6395,7 +6174,7 @@ occasionally need to break on Windows:</p>
   file, typically with a name like <code>StdAfx.h</code>
   or <code>precompile.h</code>. To make your code easier
   to share with other projects, avoid including this file
-  explicitly (except in <code>precompile.cc</code>), and
+  explicitly (except in <code>precompile.cpp</code>), and
   use the <code>/FI</code> compiler option to include the
   file automatically.</li>
 
