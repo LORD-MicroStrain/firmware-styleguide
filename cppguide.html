@@ -246,7 +246,7 @@ should be
 
 <p>To guarantee uniqueness, they should
 be based on the full path in a project's source tree. For
-example, the file <code>foo/src/bar/baz.h</code> in
+example, the file <code>foo/src/bar/baz.hpp</code> in
 project <code>foo</code> should have the following
 guard:</p>
 
@@ -415,8 +415,8 @@ mutators.</p>
 
 <div class="summary">
 <p>Use standard order for readability and to avoid hidden
-dependencies: Related header, C library, C++ library,  other libraries'
-<code>.h</code>, your project's <code>.h</code>.</p>
+dependencies: Related header, your project's <code>.hpp</code>,
+other libraries' header, C library, C++ library.</p>
 </div>
 
 <div class="stylebody">
@@ -430,7 +430,7 @@ directory without use of UNIX directory shortcuts
 <code>google-awesome-project/src/base/logging.hpp</code>
 should be included as:</p>
 
-<pre>#include "base/logging.hpp"
+<pre>#include &lt;base/logging.hpp&gt;
 </pre>
 
 <p>In <code><var>dir/foo</var>.cpp</code> or
