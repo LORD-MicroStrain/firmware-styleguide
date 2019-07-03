@@ -164,9 +164,9 @@ input.</p>
 <h2 id="C++_Version">C++ Version</h2>
 
 <p>
-Currently, code should target C++11, i.e., should not use C++14 or
-C++17 features. The C++ version targeted by this guide will advance
-(aggressively) over time.</p>
+Currently, code should target IAR 8.32.  All C++ features supported
+by IAR 8.32 are allowed, this includes C++11, C++14, and some C++17
+support</p>
 
 <p>
 Code should avoid features that have been removed from
@@ -436,13 +436,11 @@ should be included as:</p>
 <p>In <code><var>dir/foo</var>.cpp</code> or
 <code><var>dir/foo_test</var>.cpp</code>, whose main
 purpose is to implement or test the stuff in
-<code><var>dir2/foo2</var>.hpp</code>, order your includes
+<code><var>foo2</var>.hpp</code>, order your includes
 as follows:</p>
 
 <ol>
-  <li><code><var>dir2/foo2</var>.hpp</code>.</li>
-
-  <li>A blank line</li>
+  <li><code><var>foo2</var>.hpp</code>.</li>
 
   <li>
   Your project's <code>.hpp</code>
@@ -611,17 +609,17 @@ namespaces, this can add a lot of clutter.</p>
   </li><li>
 
   <p>Namespaces wrap the entire source file after
-  includes,  
-  <a href="https://gflags.github.io/gflags/">
-  gflags</a> definitions/declarations
+  includes, definitions/declarations
   and forward declarations of classes from other namespaces.</p>
 
 <pre>// In the .hpp file
-namespace mynamespace {
+namespace mynamespace
+{
 
 // All declarations are within the namespace scope.
 // Notice the lack of indentation.
-class MyClass {
+class MyClass
+{
 public:
   ...
   void foo();
@@ -631,10 +629,12 @@ public:
 </pre>
 
 <pre>// In the .cpp file
-namespace mynamespace {
+namespace mynamespace
+{
 
 // Definition of functions is within scope of the namespace.
-void MyClass::foo() {
+void MyClass::foo()
+{
   ...
 }
 
@@ -648,7 +648,8 @@ void MyClass::foo() {
 
 DEFINE_FLAG(bool, someflag, false, "dummy flag");
 
-namespace mynamespace {
+namespace mynamespace
+{
 
 using ::foo::bar;
 
@@ -657,15 +658,6 @@ using ::foo::bar;
 }  // namespace mynamespace
 </pre>
   </li>
-
-  <li>To place generated protocol
-  message code in a namespace, use the
-  <code>package</code> specifier in the
-  <code>.proto</code> file. See
-  
-  <a href="https://developers.google.com/protocol-buffers/docs/reference/cpp-generated#package">
-  Protocol Buffer Packages</a>
-  for details.</li>
 
   <li>Do not declare anything in namespace
   <code>std</code>, including forward declarations of
@@ -693,8 +685,10 @@ namespace baz = ::foo::bar::baz;
 </pre>
 
 <pre>// Shorten access to some commonly used names (in a .hpp file).
-namespace librarian {
-namespace impl {  // Internal, not part of the API.
+namespace librarian
+{
+namespace impl
+{  // Internal, not part of the API.
 namespace sidetable = ::pipeline_diagnostics::sidetable;
 }  // namespace impl
 
@@ -740,7 +734,8 @@ Do not use internal linkage in <code>.hpp</code> files.</p>
 <p>Format unnamed namespaces like named namespaces. In the
   terminating comment, leave the namespace name empty:</p>
 
-<pre>namespace {
+<pre>namespace
+{
 ...
 }  // namespace
 </pre>
