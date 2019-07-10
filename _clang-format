@@ -2,7 +2,7 @@ BasedOnStyle: Google
 IndentWidth: 2
 
 Language: Cpp
-AccessModifierOffset: 0
+AccessModifierOffset: -2
 AlignAfterOpenBracket: DontAlign
 AlignConsecutiveDeclarations: false
 AllowAllParametersOfDeclarationOnNextLine: true
@@ -19,7 +19,7 @@ BreakBeforeTernaryOperators: false
 BreakConstructorInitializers: AfterColon
 ColumnLimit: 0
 CompactNamespaces: false
-ConstructorInitializerIndentWidth: 0
+ConstructorInitializerIndentWidth: 2
 ContinuationIndentWidth: 2
 Cpp11BracedListStyle: true
 FixNamespaceComments: true
